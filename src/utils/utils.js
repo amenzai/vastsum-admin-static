@@ -54,6 +54,7 @@ export function treeDataTranslate(data, id = 'id', pid = 'parentId') {
  */
 export function clearLoginInfo() {
   Vue.cookie.delete('token')
+  window.sessionStorage.clear()
   // store.commit('resetStore')
   router.options.isAddDynamicMenuRoutes = false
 }
@@ -225,14 +226,13 @@ export function deepCopy(data) {
 /**
  * 判断是否删除 参数对象中为空的属性
  * @param {*} data
- * @param {Boolean} type when is true will delete
  */
-export function removeEmptyProp(data, type) {
+export function removeEmptyProp(data) {
   var o = deepCopy(data);
   for (var k in o) {
     if (typeOf(o[k]) === 'string') {
       o[k] = o[k].trim()
-      if (!o[k] && !type) {
+      if (!o[k]) {
         delete o[k];
       }
     } else if (typeOf(o[k]) === 'object') {

@@ -1,70 +1,44 @@
 import Vue from 'vue'
-import axios from 'axios'
+import Axios from 'axios'
 import router from '@/router'
 import qs from 'qs'
+import { Message } from 'element-ui'
 import {
   clearLoginInfo,
   removeEmptyProp
-} from '@/utils/utils'
+} from './utils'
 import config from './config'
-import {
-  Message,
-  Notification
-} from 'element-ui'
 
-// const http = axios.create({
-//   timeout: 1000 * 30,
-//   withCredentials: true,
-//   headers: {
-//     'Content-Type': 'application/json; charset=utf-8'
-//   }
-// })
-
-const isDev = process.env.NODE_ENV === 'development'
-// const contentType = 'application/x-www-form-urlencoded' //  || 'application/json'
-const contentType = 'json'
-
-axios.defaults.withCredentials = true
-axios.defaults.timeout = 1000 * 3
-axios.defaults.baseURL = isDev && process.env.OPEN_PROXY ? '/proxyApi' : config.productHost // 请求地址处理
-axios.defaults.headers = {
-  'Content-Type': contentType === 'json' ? 'application/json; charset=utf-8' : 'application/x-www-form-urlencoded'
-}
-axios.defaults.transformRequest = [
-  function (data) {
-    return contentType === 'json' ? JSON.stringify(data) : qs.stringify(data)
+const axiosInstance = Axios.create({
+  timeout: 1000 * 30,
+  withCredentials: true,
+  headers: {
+    'Content-Type': 'application/json; charset=utf-8'
   }
-]
-axios.defaults.paramsSerializer = function (params) {
-  return qs.stringify(params, {
-    arrayFormat: 'brackets'
-  })
-}
+})
 
 /**
  * 请求拦截
  */
-axios.interceptors.request.use(function (config) {
-  // commit('UPDATE_LOADING', true)
-  // config.headers['Authorization'] = Vue.cookie.get('token') // 请求头带上token
+axiosInstance.interceptors.request.use(config => {
   config.headers['token'] = Vue.cookie.get('token') // 请求头带上token
   return config
-}, function (error) {
+}, error => {
   return Promise.reject(error)
 })
 
 /**
  * 响应拦截
  */
-axios.interceptors.response.use(function (response) {
+axiosInstance.interceptors.response.use(response => {
   if (response.status === 200) {
     if (response.data.code === 401) { // 401, token失效
       console.log('请求未授权')
-      Notification({
-        title: '登录超时',
-        message: '登录超时',
-        type: 'error'
-      })
+      // Notification({
+      //   title: '登录超时',
+      //   message: '登录超时',
+      //   type: 'error'
+      // })
       clearLoginInfo()
       router.push({
         name: 'login'
@@ -77,12 +51,8 @@ axios.interceptors.response.use(function (response) {
       })
     }
   }
-  // 不显示loading
-  // commit('UPDATE_LOADING', false)
   return response
-}, function (error) {
-  // 对响应错误做点什么
-  // commit('UPDATE_LOADING', false)
+}, error => {
   const title = '服务正在升级，请稍后再试！'
   Notification({
     title: title,
@@ -92,47 +62,78 @@ axios.interceptors.response.use(function (response) {
   return Promise.reject(error)
 })
 
+/**
+ * 请求地址处理
+ * @param {*} actionName action方法名称
+ */
+axiosInstance.adornUrl = (actionName) => {
+  // 非生产环境 && 开启代理, 接口前缀统一使用[/proxyApi/]前缀做代理拦截!
+  return (process.env.NODE_ENV !== 'production' && process.env.OPEN_PROXY ? '/proxyApi' : config.productHost) + actionName
+}
 
-export default {
-  get: function (path, params, type) {
-    let url
-    if (!params) {
-      url = path
-    } else {
-      params = removeEmptyProp(params, type) //  type为true不过滤空字符串的发送
-      url = path + '?' + qs.stringify(params)
-    }
-    return new Promise((resolve, reject) => {
-      axios.get(url).then(res => {
-        if (res.data.code === 0) {
-          resolve(res.data)
-        } else if (res.data.code === 500) {
-          Message({
-            message: res.data.msg,
-            type: 'error'
-          })
-          reject(res.data)
-        }
-      })
-    })
-  },
-  post: function (path, params, type) {
-    if (!params) {
-      params = {}
-    }
-    params = removeEmptyProp(params, type)
-    return new Promise((resolve, reject) => {
-      axios.post(path, params).then(res => {
-        if (res.data.code === 0) {
-          resolve(res.data)
-        } else if (res.data.code === 500) {
-          Message({
-            message: res.data.msg,
-            type: 'error'
-          })
-          reject(res.data)
-        }
-      })
-    })
+/**
+ * get请求参数处理
+ * @param {*} params 参数对象
+ * @param {*} openDefultParams 是否开启默认参数?
+ */
+axiosInstance.adornParams = (params = {}) => {
+  return params
+}
+
+/**
+ * post请求数据处理
+ * @param {*} data 数据对象
+ * @param {*} openDefultdata 是否开启默认数据?
+ * @param {*} contentType 数据格式
+ *  json: 'application/json; charset=utf-8'
+ *  form: 'application/x-www-form-urlencoded; charset=utf-8'
+ */
+axiosInstance.adornData = (data = {}, openDefultdata = true, contentType = 'json') => {
+  return contentType === 'json' ? JSON.stringify(data) : qs.stringify(data)
+}
+
+/**
+ * [http description]
+ * @param  {[String]} method [get/post/delete/put]
+ * @param  {[String]} url    [api/list]
+ * @param  {[Object | Array]} data   [发送的数据]
+ * @param  {[Boolean]} type   [是否发送空字符，默认不发送，false]
+ * @return {[Promise]}        [返回一个promise]
+ */
+var http = function(method, url, data = {}, type = false) {
+  if (!type) {
+    data = removeEmptyProp(data)
   }
+  var params = {}
+  if (method.toUpperCase() === 'GET') {
+    params = axiosInstance.adornParams(data)
+  } else {
+    data = axiosInstance.adornData(data)
+  }
+  return new Promise((resolve, reject) => {
+    axiosInstance({
+      url: axiosInstance.adornUrl(url),
+      method,
+      data,
+      params
+    }).then(({ data }) => {
+      if (data.code === 0) {
+        resolve(data)
+      } else {
+        if (data.code === 500) {
+          Message({
+            message: data.message,
+            type: 'error'
+          })
+        }
+        reject(data)
+      }
+    }).catch((error) => {
+      reject(error)
+    })
+  })
+}
+export default axiosInstance
+export {
+  http
 }

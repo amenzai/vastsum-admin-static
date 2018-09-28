@@ -10,7 +10,8 @@ import {
 
 import constant from './constant'
 
-import http from './httpRequest'
+// import http from './httpRequest'
+import axiosInstance from './httpRequest'
 
 // import storage from 'good-storage'
 
@@ -24,7 +25,8 @@ export default {
     Vue.prototype.$dealNumber = dealNumber;
     Vue.prototype.isAuth = isAuth;
     Vue.prototype.$clearLoginInfo = clearLoginInfo;
-    Vue.prototype.$http = http;
+    // Vue.prototype.$http = http;
+    Vue.prototype.$http = axiosInstance;
     // Vue.prototype.$storage = storage;
 
     // Vue.filter('getLabel', searchDictionary);
