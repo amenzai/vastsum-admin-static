@@ -122,7 +122,7 @@ var http = function(method, url, data = {}, type = false) {
       } else {
         if (data.code === 500) {
           Message({
-            message: data.message,
+            message: data.msg,
             type: 'error'
           })
         }

@@ -25,6 +25,7 @@
     <div class="mb10" v-if="isAuth('user:customer:assign')">
       <el-button type="primary" @click="handleAllotService">分配客服</el-button>
     </div>
+    <icon-svg name="ICAtubiao_yanzheng"></icon-svg>
     <el-table :data="tableData" border style="width: 100%" v-loading="tableLoading" @selection-change="selectionChangeHandle">
       <el-table-column type="selection" header-align="center" align="center" width="50">
       </el-table-column>
