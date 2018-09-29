@@ -2,7 +2,7 @@ import Vue from 'vue'
 import Axios from 'axios'
 import router from '@/router'
 import qs from 'qs'
-import { Message } from 'element-ui'
+import { Message, Notification } from 'element-ui'
 import {
   clearLoginInfo,
   removeEmptyProp

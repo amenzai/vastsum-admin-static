@@ -34,6 +34,12 @@ img {
 .clearfix:after {
   clear: both;
 }
+.mb10 {
+  margin-bottom: 10px;
+}
+.mb20 {
+  margin-bottom: 20px;
+}
 
 
 /* Animation
@@ -174,7 +180,7 @@ img {
     text-transform: uppercase;
     white-space: nowrap;
     color: #fff;
-    
+
     &-lg,
     &-mini {
       margin: 0 5px;

@@ -27,17 +27,18 @@
             :src="item.iframeUrl"
             width="100%" height="100%" frameborder="0" scrolling="yes">
           </iframe>
-          <keep-alive v-else>
+          <!-- <keep-alive v-else>
             <router-view v-if="item.name === mainTabsActiveName" />
-          </keep-alive>
+          </keep-alive> -->
+          <router-view v-else-if="item.name === mainTabsActiveName" />
         </el-card>
       </el-tab-pane>
     </el-tabs>
     <!-- 主入口标签页 e -->
     <el-card v-else :body-style="siteContentViewHeight">
-      <keep-alive>
-        <router-view />
-      </keep-alive>
+      <!-- <keep-alive> -->
+      <router-view />
+      <!-- </keep-alive> -->
     </el-card>
   </main>
 </template>
@@ -79,7 +80,8 @@
       selectedTabHandle (tab) {
         tab = this.mainTabs.filter(item => item.name === tab.name)
         if (tab.length >= 1) {
-          this.$router.push({ name: tab[0].name })
+          // this.$router.push({ name: tab[0].name })
+          this.$router.push({ path: tab[0].fullPath })
         }
       },
       // tabs, 删除tab
@@ -88,8 +90,9 @@
         if (this.mainTabs.length >= 1) {
           // 当前选中tab被删除
           if (tabName === this.mainTabsActiveName) {
-            this.$router.push({ name: this.mainTabs[this.mainTabs.length - 1].name }, () => {
+            this.$router.push({ path: this.mainTabs[this.mainTabs.length - 1].fullPath }, () => {
               this.mainTabsActiveName = this.$route.name
+              console.log(123);
             })
           }
         } else {

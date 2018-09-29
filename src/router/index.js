@@ -35,6 +35,8 @@ const mainRoutes = {
     // 提示: 如需要通过iframe嵌套展示内容, 但不通过tab打开, 请自行创建组件使用iframe处理!
     { path: '/home', component: _import('home'), name: 'home', meta: { title: '首页' } },
     { path: '/theme', component: _import('theme'), name: 'theme', meta: { title: '主题' } },
+    { path: '/demo-list', component: _import('demo/list'), name: 'demo-list', meta: { title: '列表', isTab: true } },
+    { path: '/demo-detail', component: _import('demo/detail'), name: 'demo-detail', meta: { title: '详情', isTab: true } },
     { path: '/demo-echarts', component: _import('demo/echarts'), name: 'demo-echarts', meta: { title: 'demo-echarts', isTab: true } },
     { path: '/demo-ueditor', component: _import('demo/ueditor'), name: 'demo-ueditor', meta: { title: 'demo-ueditor', isTab: true } }
   ],

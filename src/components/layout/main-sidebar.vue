@@ -23,6 +23,10 @@
             <icon-svg name="editor" class="site-sidebar__menu-icon"></icon-svg>
             <span slot="title">ueditor</span>
           </el-menu-item>
+          <el-menu-item index="demo-list" @click="$router.push({ name: 'demo-list' })">
+            <icon-svg name="editor" class="site-sidebar__menu-icon"></icon-svg>
+            <span slot="title">列表</span>
+          </el-menu-item>
         </el-submenu>
         <sub-menu
           v-for="menu in menuList"
@@ -82,24 +86,39 @@
     methods: {
       // 路由操作
       routeHandle (route) {
+        console.log(route);
         if (route.meta.isTab) {
           // tab选中, 不存在先添加
-          var tab = this.mainTabs.filter(item => item.name === route.name)[0]
-          if (!tab) {
-            if (route.meta.isDynamic) {
-              route = this.dynamicMenuRoutes.filter(item => item.name === route.name)[0]
-              if (!route) {
-                return console.error('未能找到可用标签页!')
+          // var tab = this.mainTabs.filter(item => item.name === route.name)[0]
+          var tab
+          for (var i = 0; i < this.mainTabs.length; i++) {
+            if (this.mainTabs[i].name === route.name) {
+              if (this.mainTabs[i].fullPath === route.fullPath) {
+                // 存在相同的组件，并且fullPath一样
+                tab = this.mainTabs[i]
+              } else {
+                // 存在相同的组件，fullPath不一样，移除原来的组件
+                this.mainTabs = this.mainTabs.filter((item, index) => index !== i)
               }
             }
+          }
+          if (!tab) {
+            // if (route.meta.isDynamic) {
+            //   route = this.dynamicMenuRoutes.filter(item => item.name === route.name)[0]
+            //   if (!route) {
+            //     return console.error('未能找到可用标签页!')
+            //   }
+            // }
             tab = {
               menuId: route.meta.menuId || route.name,
               name: route.name,
               title: route.meta.title,
               type: isURL(route.meta.iframeUrl) ? 'iframe' : 'module',
-              iframeUrl: route.meta.iframeUrl || ''
+              iframeUrl: route.meta.iframeUrl || '',
+              fullPath: route.fullPath
             }
             this.mainTabs = this.mainTabs.concat(tab)
+            console.log(this.mainTabs);
           }
           this.menuActiveName = tab.menuId + ''
           this.mainTabsActiveName = tab.name

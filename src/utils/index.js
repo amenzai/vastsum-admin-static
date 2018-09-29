@@ -1,11 +1,13 @@
 import {
-  // searchDictionary,
+  searchDictionary,
   seeLabel,
   dateFmt,
   currencyFmt,
   dealNumber,
   isAuth,
-  clearLoginInfo
+  clearLoginInfo,
+  getAreaCodeArr,
+  getAreaInfo
 } from './utils'
 
 import constant from './constant'
@@ -17,7 +19,7 @@ import axiosInstance from './httpRequest'
 
 export default {
   install(Vue) {
-    // Vue.prototype.$getWord = searchDictionary;
+    Vue.prototype.$getDicList = searchDictionary;
     Vue.prototype.$dateFilter = dateFmt;
     Vue.prototype.$CONSTANT = constant;
     Vue.prototype.$currency = currencyFmt;
@@ -28,10 +30,13 @@ export default {
     // Vue.prototype.$http = http;
     Vue.prototype.$http = axiosInstance;
     // Vue.prototype.$storage = storage;
+    Vue.prototype.$getAreaCodeArr = getAreaCodeArr // 获取地区code
+    Vue.prototype.$getAreaInfo = getAreaInfo // 获取地区信息
 
-    // Vue.filter('getLabel', searchDictionary);
+    Vue.filter('getLabel', searchDictionary);
     Vue.filter('seeLabel', seeLabel);
     Vue.filter('currency', currencyFmt);
     Vue.filter('dateFilter', dateFmt);
+    Vue.filter('getAreaInfo', getAreaInfo);
   }
 }

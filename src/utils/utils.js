@@ -1,7 +1,8 @@
 import Vue from 'vue'
 import router from '@/router'
 // import store from '@/store'
-// import dictionary from './dictionary.json'
+import dictionary from './dictionary.json'
+import addressArr from './address'
 
 /**
  * 获取uuid
@@ -64,18 +65,19 @@ export function clearLoginInfo() {
  * @param {*} value
  * @param {*} name
  */
-// export function searchDictionary(value, name) {
-//   if (arguments.length === 1) return dictionary[value].options || []; //  如果参数只有一个，获取对应的arr
-//   const arr = dictionary[name].options || [];
-//   let result = ''
-//   for (let i = 0; i < arr.length; i++) {
-//     if (arr[i].value == value) {
-//       result = arr[i].label
-//       break
-//     }
-//   }
-//   return result;
-// }
+export function searchDictionary(value, name) {
+  if (arguments.length === 1) return dictionary[value].options || []; //  如果参数只有一个，获取对应的arr
+  if (!dictionary[name]) return
+  const arr = dictionary[name].options || [];
+  let result = ''
+  for (let i = 0; i < arr.length; i++) {
+    if (arr[i].value == value) {
+      result = arr[i].label
+      break
+    }
+  }
+  return result;
+}
 
 /**
  * 日期格式化
@@ -240,4 +242,58 @@ export function removeEmptyProp(data) {
     }
   }
   return o
+}
+
+/**
+ * 获取地区 code 数组
+ * @param {*} childCode
+ */
+export function getAreaCodeArr(childCode) {
+  if (!childCode) return;
+  const arr = [];
+  const len = addressArr.length
+  for (var i = 0; i < len; i++) {
+    var parent = addressArr[i];
+    var children = parent.children;
+    if (children) {
+      const len = children.length
+      for (var j = 0; j < len; j++) {
+        if (children[j].value === childCode) {
+          arr.push(children[j].parentCode);
+          break;
+        }
+      }
+      if (arr.length) {
+        arr.push(childCode);
+        break;
+      }
+    }
+  }
+  return arr;
+}
+
+/**
+ * 获取地区信息
+ * @param {*} childCode
+ */
+export function getAreaInfo(childCode) {
+  const length = addressArr.length
+  let str = '';
+  for (var i = 0; i < length; i++) {
+    var parent = addressArr[i];
+    var children = parent.children;
+    if (children) {
+      const len = children.length
+      for (var j = 0; j < len; j++) {
+        if (children[j].value === childCode) {
+          str = parent.label + children[j].label
+          return str
+        }
+      }
+    } else if (parent.value === childCode) {
+      str = parent.label
+      return str
+    }
+  }
+  return str;
 }
