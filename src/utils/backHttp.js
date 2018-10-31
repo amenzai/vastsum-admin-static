@@ -99,7 +99,7 @@ export default {
       url = path
     } else {
       if (!type) {
-        params = removeEmptyProp(params, type) //  type为true不过滤空字符串的发送
+        params = removeEmptyProp(params) //  type为true不过滤空字符串的发送
       }
       url = path + '?' + qs.stringify(params)
     }
@@ -122,7 +122,7 @@ export default {
       params = {}
     }
     if (!type) {
-      params = removeEmptyProp(params, type) //  type为true不过滤空字符串的发送
+      params = removeEmptyProp(params) //  type为true不过滤空字符串的发送
     }
     return new Promise((resolve, reject) => {
       axios.post(path, params).then(res => {
